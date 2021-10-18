@@ -106,8 +106,7 @@
               <div
                 class="
                   flex
-                  relative
-                  shadow
+                  relative                  
                   rounded-full
                   justify-center
                   items-center
@@ -118,7 +117,7 @@
                   h-8
                   text-xs text-center
                 "
-                :class="isDarkMode ? 'bg-gray-900' : 'bg-white'"
+                :class="isDarkMode ? 'shadow-3xl bg-gray-800' : 'bg-white shadow'"
                 @click="
                   {
                     isActive = !isActive;
@@ -341,6 +340,7 @@ export default {
       arrDeal: [],
       search: "",
       isActive: true,
+      user: "",
     };
   },
   methods: {
@@ -400,6 +400,11 @@ export default {
         });
       }
     },
+    logout() {
+        axios.post('/api/logout').then(()=> {
+            this.$router.push({name: 'login'})
+        })
+    }
   },
   mounted() {
     axios
@@ -433,6 +438,9 @@ export default {
       });
       //   console.log(this.arrDeal);
     });
+    axios.get("/api/user").then((ress) => {
+      console.log(ress);
+    });  
   },
 };
 </script>

@@ -1,20 +1,3 @@
-<!--
-  This example requires Tailwind CSS v2.0+
-
-  This example requires some changes to your config:
-
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ]
-  }
-  ```
--->
-
 <template>
   <div
     class="
@@ -39,13 +22,6 @@
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Sign in to your account
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
-          Or
-          {{ " " }}
-          <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
-            start your 14-day free trial
-          </a>
-        </p>
       </div>
       <form
         class="mt-8 space-y-6"
@@ -57,8 +33,9 @@
         <div class="rounded-md shadow-sm -space-y-px">
           <div>
             <label for="email-address" class="sr-only">Email address</label>
+            <span class="text-red-500" v-if="error">{{ error }}</span>
             <input
-              v-model="email"
+              v-model="form.email"
               id="email-address"
               name="email"
               type="email"
@@ -88,7 +65,7 @@
           <div>
             <label for="password" class="sr-only">Password</label>
             <input
-              v-model="password"
+              v-model="form.password"
               id="password"
               name="password"
               type="password"
@@ -148,8 +125,7 @@
         </div>
 
         <div>
-          <router-link
-            to="/dashboard"
+          <button
             type="submit"
             class="
               group
@@ -170,14 +146,8 @@
               focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
             "
           >
-            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-              <!-- <LockClosedIcon
-                class="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"
-                aria-hidden="true"
-              /> -->
-            </span>
-            Sign in
-          </router-link>
+            <span id="sigIn"> Sign in </span>
+          </button>
         </div>
       </form>
     </div>
@@ -193,29 +163,49 @@ export default {
   components: {},
   data() {
     return {
-      email: "",
-      password: "",
+      form: {
+        email: "",
+        password: "",
+      },
       error: "",
     };
   },
   methods: {
     submit() {
+      this.loadingState();
       axios
-        .post("api/login", {
-          email: this.email,
-          password: this.password,
-        })
+        .post("/api/login", this.form)
         .then((response) => {
-          let data = response.data;
-          localStorage.setItem("user", JSON.stringify(data.user));
-          localStorage.setItem("jwt", data.token);
-          this.$emit("setData");
-
-          this.$router.push({ name: "user", params: { userId: data.user.id } });
+            this.$router.push({ name: "dashboard" });
         })
         .catch((error) => {
-          this.error = error.response.data.error;
+          this.error = error.response.data.errors.email[0];
+          document.getElementById("sigIn").innerHTML = "Sign in";
+          this.form == "";
         });
+    },
+    loadingState() {
+      document.getElementById("sigIn").innerHTML = `
+          <svg
+            class="animate-spin h-5 w-5 text-white font-medium"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+        >
+            <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+            ></circle>
+            <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+        </svg>`;
     },
   },
 };

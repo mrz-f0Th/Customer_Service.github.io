@@ -1,5 +1,4 @@
 //Register.vue
-<!--
 <template>
   <div class="container">
     <div class="row justify-content-center">
@@ -47,38 +46,36 @@
     </div>
   </div>
 </template>
--->
 
-// <script>
-// export default {
-//   name: "Register",
-//   data() {
-//     return {
-//       user: {
-//         name: "",
-//         email: "",
-//         password: "",
-//         password_confirmation: "",
-//       },
-//       errors: null,
-//     };
-//   },
-//   methods: {
-//     submit() {
-//       axios
-//         .post("api/register", this.user)
-//         .then((response) => {
-//           let data = response.data;
-//           localStorage.setItem("user", JSON.stringify(data.user));
-//           localStorage.setItem("jwt", data.token);
+<script>
+export default {
+  name: "Register",
+  data() {
+    return {
+      user: {
+        name: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
+      },
+      errors: null,
+    };
+  },
+  methods: {
+    submit() {
+      axios
+        .post("api/register", this.user)
+        .then((response) => {
+          let data = response.data;
+          localStorage.setItem("user", JSON.stringify(data.user));
+          localStorage.setItem("jwt", data.token);
 
-//           this.$router.push({ name: "user", params: { userId: data.user.id } });
-//         })
-//         .catch((error) => {
-//           this.errors = error.response.data.errors;
-//         });
-//     },
-//   },
-// };
-//
+          this.$router.push({ name: "user", params: { userId: data.user.id } });
+        })
+        .catch((error) => {
+          this.errors = error.response.data.errors;
+        });
+    },
+  },
+};
 </script>

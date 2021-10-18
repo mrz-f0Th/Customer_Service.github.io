@@ -2227,6 +2227,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2234,7 +2236,17 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   props: ["isDarkMode"],
-  methods: {}
+  methods: {
+    logout: function logout() {
+      var _this = this;
+
+      axios.post('/api/logout').then(function () {
+        _this.$router.push({
+          name: 'login'
+        });
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -3122,7 +3134,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
  // import LineChart from "../components/LineChart.vue";
 
 
@@ -3143,7 +3154,8 @@ __webpack_require__.r(__webpack_exports__);
       listUsers: [],
       arrDeal: [],
       search: "",
-      isActive: true
+      isActive: true,
+      user: ""
     };
   },
   methods: {
@@ -3206,37 +3218,49 @@ __webpack_require__.r(__webpack_exports__);
           }); //   console.log(this.arrDeal);
         });
       }
+    },
+    logout: function logout() {
+      var _this3 = this;
+
+      axios.post('/api/logout').then(function () {
+        _this3.$router.push({
+          name: 'login'
+        });
+      });
     }
   },
   mounted: function mounted() {
-    var _this3 = this;
+    var _this4 = this;
 
     axios.get("/api/client").then(function (response) {
-      _this3.users = response.data.data.length;
+      _this4.users = response.data.data.length;
       var data = response.data.data;
       data.forEach(function (d) {
         if (d.status.length === 4) {
-          _this3.userDeal++;
+          _this4.userDeal++;
         }
 
         if (d.status.length === 10) {
-          _this3.userKonsul++;
+          _this4.userKonsul++;
         }
       });
 
-      _this3.setUser(data);
+      _this4.setUser(data);
     })["catch"](function (err) {
       return console.log(err);
     });
     axios.get("/api/dealfull").then(function (response) {
       var totals = [];
-      _this3.arrDeal = totals;
+      _this4.arrDeal = totals;
       var data = response.data.data;
       data.forEach(function (d) {
         var date = moment__WEBPACK_IMPORTED_MODULE_1___default()(d.tanggal, "YYYYMMDD").format("LL");
         var jumlah = d.jumlah;
         totals.push([date, jumlah]);
       }); //   console.log(this.arrDeal);
+    });
+    axios.get("/api/user").then(function (ress) {
+      console.log(ress);
     });
   }
 });
@@ -3411,44 +3435,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 // // import { LockClosedIcon } from "@heroicons/vue/solid";
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "Login",
   components: {},
   data: function data() {
     return {
-      email: "",
-      password: "",
+      form: {
+        email: "",
+        password: ""
+      },
       error: ""
     };
   },
@@ -3456,25 +3452,19 @@ __webpack_require__.r(__webpack_exports__);
     submit: function submit() {
       var _this = this;
 
-      axios.post("api/login", {
-        email: this.email,
-        password: this.password
-      }).then(function (response) {
-        var data = response.data;
-        localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("jwt", data.token);
-
-        _this.$emit("setData");
-
+      this.loadingState();
+      axios.post("/api/login", this.form).then(function (response) {
         _this.$router.push({
-          name: "user",
-          params: {
-            userId: data.user.id
-          }
+          name: "dashboard"
         });
       })["catch"](function (error) {
-        _this.error = error.response.data.error;
+        _this.error = error.response.data.errors.email[0];
+        document.getElementById("sigIn").innerHTML = "Sign in";
+        _this.form == "";
       });
+    },
+    loadingState: function loadingState() {
+      document.getElementById("sigIn").innerHTML = "\n          <svg\n            class=\"animate-spin h-5 w-5 text-white font-medium\"\n            xmlns=\"http://www.w3.org/2000/svg\"\n            fill=\"none\"\n            viewBox=\"0 0 24 24\"\n        >\n            <circle\n            class=\"opacity-25\"\n            cx=\"12\"\n            cy=\"12\"\n            r=\"10\"\n            stroke=\"currentColor\"\n            stroke-width=\"4\"\n            ></circle>\n            <path\n            class=\"opacity-75\"\n            fill=\"currentColor\"\n            d=\"M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z\"\n            ></path>\n        </svg>";
     }
   }
 });
@@ -3495,6 +3485,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _components_Navbar_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/Navbar.vue */ "./resources/js/components/Navbar.vue");
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -5000,17 +4997,11 @@ __webpack_require__.r(__webpack_exports__);
   routes: [{
     path: '/',
     name: 'login',
-    component: _views_Login__WEBPACK_IMPORTED_MODULE_5__.default,
-    meta: {
-      guest: true
-    }
+    component: _views_Login__WEBPACK_IMPORTED_MODULE_5__.default
   }, // {
-  //     path: '/register',
+  //     path: '/regist',
   //     name: 'register',
   //     component: Register,
-  //     meta: {
-  //         guest: true
-  //     }
   // },
   // {
   //     path: '/:userId',
@@ -5023,8 +5014,17 @@ __webpack_require__.r(__webpack_exports__);
   // },
   {
     path: '/dashboard',
-    name: 'home',
-    component: _views_Home__WEBPACK_IMPORTED_MODULE_0__.default
+    name: 'dashboard',
+    component: _views_Home__WEBPACK_IMPORTED_MODULE_0__.default // beforeEnter: (to, form, next) => {
+    //     axios.get('/api/athenticated').then(() => {
+    //         next()
+    //     }).catch(() => {
+    //         return next({
+    //             name: 'login'
+    //         })
+    //     })
+    // }
+
   }, {
     path: '/add',
     name: 'add',
@@ -48373,7 +48373,35 @@ var render = function() {
               )
             ]),
             _vm._v(" "),
-            _vm._m(1)
+            _c(
+              "div",
+              { staticClass: "flex -space-x-2 mr-7 overflow-hidden" },
+              [
+                _c(
+                  "router-link",
+                  {
+                    staticClass: "bg-gray-50",
+                    attrs: { to: "/" },
+                    on: {
+                      click: function($event) {
+                        return _vm.logout()
+                      }
+                    }
+                  },
+                  [
+                    _c("img", {
+                      staticClass: "inline-block h-10 w-10 rounded-full",
+                      attrs: {
+                        src:
+                          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+                        alt: ""
+                      }
+                    })
+                  ]
+                )
+              ],
+              1
+            )
           ]
         )
       ]
@@ -48526,7 +48554,7 @@ var render = function() {
             staticClass: "flex items-center w-1/4 rounded-t-xl",
             class: _vm.isDarkMode ? "bg-white" : "bg-gray-900"
           },
-          [_vm._m(2)]
+          [_vm._m(1)]
         )
       ]
     )
@@ -48548,21 +48576,6 @@ var staticRenderFns = [
           }
         })
       ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "flex -space-x-2 mr-7 overflow-hidden" }, [
-      _c("img", {
-        staticClass: "inline-block h-10 w-10 rounded-full",
-        attrs: {
-          src:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-          alt: ""
-        }
-      })
     ])
   },
   function() {
@@ -49567,8 +49580,10 @@ var render = function() {
                           "div",
                           {
                             staticClass:
-                              "\n                flex\n                relative\n                shadow\n                rounded-full\n                justify-center\n                items-center\n                cursor-pointer\n                ml-5\n                mr-5\n                md:mr-0\n                h-8\n                text-xs text-center\n              ",
-                            class: _vm.isDarkMode ? "bg-gray-900" : "bg-white",
+                              "\n                flex\n                relative                  \n                rounded-full\n                justify-center\n                items-center\n                cursor-pointer\n                ml-5\n                mr-5\n                md:mr-0\n                h-8\n                text-xs text-center\n              ",
+                            class: _vm.isDarkMode
+                              ? "shadow-3xl bg-gray-800"
+                              : "bg-white shadow",
                             attrs: {
                               "aria-pressed": _vm.isActive ? "true" : "false"
                             },
@@ -49880,38 +49895,7 @@ var render = function() {
     },
     [
       _c("div", { staticClass: "max-w-md w-full space-y-8" }, [
-        _c("div", [
-          _c("img", {
-            staticClass: "mx-auto h-12 w-auto",
-            attrs: {
-              src:
-                "https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg",
-              alt: "Workflow"
-            }
-          }),
-          _vm._v(" "),
-          _c(
-            "h2",
-            {
-              staticClass:
-                "mt-6 text-center text-3xl font-extrabold text-gray-900"
-            },
-            [_vm._v("\n        Sign in to your account\n      ")]
-          ),
-          _vm._v(" "),
-          _c("p", { staticClass: "mt-2 text-center text-sm text-gray-600" }, [
-            _vm._v("\n        Or\n        " + _vm._s(" ") + "\n        "),
-            _c(
-              "a",
-              {
-                staticClass:
-                  "font-medium text-indigo-600 hover:text-indigo-500",
-                attrs: { href: "#" }
-              },
-              [_vm._v("\n          start your 14-day free trial\n        ")]
-            )
-          ])
-        ]),
+        _vm._m(0),
         _vm._v(" "),
         _c(
           "form",
@@ -49938,13 +49922,19 @@ var render = function() {
                   [_vm._v("Email address")]
                 ),
                 _vm._v(" "),
+                _vm.error
+                  ? _c("span", { staticClass: "text-red-500" }, [
+                      _vm._v(_vm._s(_vm.error))
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
                 _c("input", {
                   directives: [
                     {
                       name: "model",
                       rawName: "v-model",
-                      value: _vm.email,
-                      expression: "email"
+                      value: _vm.form.email,
+                      expression: "form.email"
                     }
                   ],
                   staticClass:
@@ -49957,13 +49947,13 @@ var render = function() {
                     required: "",
                     placeholder: "Email address"
                   },
-                  domProps: { value: _vm.email },
+                  domProps: { value: _vm.form.email },
                   on: {
                     input: function($event) {
                       if ($event.target.composing) {
                         return
                       }
-                      _vm.email = $event.target.value
+                      _vm.$set(_vm.form, "email", $event.target.value)
                     }
                   }
                 })
@@ -49981,8 +49971,8 @@ var render = function() {
                     {
                       name: "model",
                       rawName: "v-model",
-                      value: _vm.password,
-                      expression: "password"
+                      value: _vm.form.password,
+                      expression: "form.password"
                     }
                   ],
                   staticClass:
@@ -49995,42 +49985,22 @@ var render = function() {
                     required: "",
                     placeholder: "Password"
                   },
-                  domProps: { value: _vm.password },
+                  domProps: { value: _vm.form.password },
                   on: {
                     input: function($event) {
                       if ($event.target.composing) {
                         return
                       }
-                      _vm.password = $event.target.value
+                      _vm.$set(_vm.form, "password", $event.target.value)
                     }
                   }
                 })
               ])
             ]),
             _vm._v(" "),
-            _vm._m(0),
+            _vm._m(1),
             _vm._v(" "),
-            _c(
-              "div",
-              [
-                _c(
-                  "router-link",
-                  {
-                    staticClass:
-                      "\n            group\n            relative\n            w-full\n            flex\n            justify-center\n            py-2\n            px-4\n            border border-transparent\n            text-sm\n            font-medium\n            rounded-md\n            text-white\n            bg-indigo-600\n            hover:bg-indigo-700\n            focus:outline-none\n            focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500\n          ",
-                    attrs: { to: "/dashboard", type: "submit" }
-                  },
-                  [
-                    _c("span", {
-                      staticClass:
-                        "absolute left-0 inset-y-0 flex items-center pl-3"
-                    }),
-                    _vm._v("\n          Sign in\n        ")
-                  ]
-                )
-              ],
-              1
-            )
+            _vm._m(2)
           ]
         )
       ])
@@ -50038,6 +50008,28 @@ var render = function() {
   )
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", [
+      _c("img", {
+        staticClass: "mx-auto h-12 w-auto",
+        attrs: {
+          src: "https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg",
+          alt: "Workflow"
+        }
+      }),
+      _vm._v(" "),
+      _c(
+        "h2",
+        {
+          staticClass: "mt-6 text-center text-3xl font-extrabold text-gray-900"
+        },
+        [_vm._v("\n        Sign in to your account\n      ")]
+      )
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -50070,6 +50062,22 @@ var staticRenderFns = [
           [_vm._v("\n            Forgot your password?\n          ")]
         )
       ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", [
+      _c(
+        "button",
+        {
+          staticClass:
+            "\n            group\n            relative\n            w-full\n            flex\n            justify-center\n            py-2\n            px-4\n            border border-transparent\n            text-sm\n            font-medium\n            rounded-md\n            text-white\n            bg-indigo-600\n            hover:bg-indigo-700\n            focus:outline-none\n            focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500\n          ",
+          attrs: { type: "submit" }
+        },
+        [_c("span", { attrs: { id: "sigIn" } }, [_vm._v(" Sign in ")])]
+      )
     ])
   }
 ]
@@ -50536,20 +50544,8 @@ var render = function() {
                                           ),
                                           _vm._v(" "),
                                           _c(
-                                            "svg",
+                                            "div",
                                             {
-                                              staticClass:
-                                                "h-6 w-6 cursor-pointer hover:text-red-600 mx-2",
-                                              class: _vm.isDarkMode
-                                                ? "text-white"
-                                                : "",
-                                              attrs: {
-                                                xmlns:
-                                                  "http://www.w3.org/2000/svg",
-                                                fill: "none",
-                                                viewBox: "0 0 24 24",
-                                                stroke: "currentColor"
-                                              },
                                               on: {
                                                 click: function($event) {
                                                   return _vm.deleteCustomer(
@@ -50559,15 +50555,35 @@ var render = function() {
                                               }
                                             },
                                             [
-                                              _c("path", {
-                                                attrs: {
-                                                  "stroke-linecap": "round",
-                                                  "stroke-linejoin": "round",
-                                                  "stroke-width": "2",
-                                                  d:
-                                                    "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                                }
-                                              })
+                                              _c(
+                                                "svg",
+                                                {
+                                                  staticClass:
+                                                    "\n                            h-6\n                            w-6\n                            cursor-pointer\n                            hover:text-red-600\n                            mx-2\n                          ",
+                                                  class: _vm.isDarkMode
+                                                    ? "text-white"
+                                                    : "",
+                                                  attrs: {
+                                                    xmlns:
+                                                      "http://www.w3.org/2000/svg",
+                                                    fill: "none",
+                                                    viewBox: "0 0 24 24",
+                                                    stroke: "currentColor"
+                                                  }
+                                                },
+                                                [
+                                                  _c("path", {
+                                                    attrs: {
+                                                      "stroke-linecap": "round",
+                                                      "stroke-linejoin":
+                                                        "round",
+                                                      "stroke-width": "2",
+                                                      d:
+                                                        "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                    }
+                                                  })
+                                                ]
+                                              )
                                             ]
                                           )
                                         ],

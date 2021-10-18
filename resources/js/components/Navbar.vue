@@ -160,11 +160,13 @@
           </p>
         </div>
         <div class="flex -space-x-2 mr-7 overflow-hidden">
+          <router-link to="/" @click="logout()" class="bg-gray-50">
           <img
             class="inline-block h-10 w-10 rounded-full"
             src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
             alt=""
           />
+          </router-link>
         </div>
       </div>
     </div>
@@ -310,7 +312,13 @@ export default {
     };
   },
   props: ["isDarkMode"],
-  methods: {},
+  methods: {
+    logout() {
+        axios.post('/api/logout').then(()=> {
+            this.$router.push({name: 'login'})
+        })
+    }
+  },
 };
 </script>
 

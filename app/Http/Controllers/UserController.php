@@ -1,62 +1,48 @@
-//UserController.php
 <?php
 
 namespace App\Http\Controllers;
 
-use Auth;
 use App\Models\User;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-        if (Auth::attempt($credentials)) {
-            $status = 200;
-            $response = [
-                'user' => Auth::user(),
-                'token' => Auth::user()->createToken('userToken')->accessToken,
-            ];
-        } else {
-            $status = 401;
-            $response = ['error' => 'The email or password is incorrect.'];
+        if (Auth::attempt($request->only('email', 'password'))) {
+            return response()->json(Auth::user(), 200);
         }
-
-        return response()->json($response, $status);
+        throw ValidationException::withMessages([
+            'email' => ['Email atau password salah !!!']
+        ]);
+    }
+    public function logout()
+    {
+        Auth::logout();
     }
 
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|max:25',
-            'email' => 'required|unique:users|email',
-            'password' => 'required|min:8',
-            'password_confirmation' => 'required|same:password',
+        $request->validate([
+            'name' => ['required'],
+            'email' => ['required', 'email', 'unique:users'],
+            'password' => ['required', 'min:6', 'confirmed']
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 401);
-        }
-
-        $input = $request->all();
-        $input['password'] = bcrypt($input['password']);
-
-        $user = User::create($input);
-
-        $response = [
-            'user' => $user,
-            'token' => $user->createToken('userToken')->accessToken,
-        ];
-
-        return response()->json($response, 200);
-    }
-
-    public function show(User $user)
-    {
-        return response()->json($user, 200);
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
+        ]);
     }
 }

@@ -11,6 +11,16 @@ use Illuminate\Support\Facades\Route;
 // Route::group(['middleware' => 'auth:api'], function () {
 //     Route::get('users/{user}', [UserController::class, 'show']);
 // });
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+// Route::middleware('auth:sanctum')->get('/athenticated', function () {
+//     return true;
+// });
+Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [UserController::class, 'login']);
+Route::post('/logout', [UserController::class, 'logout']);
 Route::resource('/client', DataClientController::class)->except(['create', 'edit']);
 Route::get("/baru", [DataClientController::class, 'baru']);
 Route::get("/deal", [DataClientController::class, 'deal']);

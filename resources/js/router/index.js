@@ -16,17 +16,12 @@ export default {
             path: '/',
             name: 'login',
             component: Login,
-            meta: {
-                guest: true
-            }
         },
         // {
-        //     path: '/register',
+        //     path: '/regist',
         //     name: 'register',
         //     component: Register,
-        //     meta: {
-        //         guest: true
-        //     }
+
         // },
         // {
         //     path: '/:userId',
@@ -39,21 +34,34 @@ export default {
         // },
         {
             path: '/dashboard',
-            name: 'home',
+            name: 'dashboard',
             component: Home,
-        }, {
+            // beforeEnter: (to, form, next) => {
+            //     axios.get('/api/athenticated').then(() => {
+            //         next()
+            //     }).catch(() => {
+            //         return next({
+            //             name: 'login'
+            //         })
+            //     })
+            // }
+        },
+        {
             path: '/add',
             name: 'add',
             component: Add,
-        }, {
+        },
+        {
             path: '/report',
             name: 'report',
             component: Report,
-        }, {
+        },
+        {
             path: '/report/update/:id',
             name: 'UpdateUser',
             component: UpdateUser,
-        }, {
+        },
+        {
             path: '/report/detail/:id',
             name: 'UserDetail',
             component: UserDetail,
